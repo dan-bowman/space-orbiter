@@ -69,7 +69,7 @@ class Planet:
         r_vector_mag = self.get_r_mag(body)
         accel_vector = self.get_accel_vector(body)
 
-        # If body is within sphere of influence, add acceleration to body object
+        # If body is within sphere of influence, add the acceleration to body object
         if r_vector_mag < self.inf:
             body.add_dx(accel_vector[0])
             body.add_dy(accel_vector[1])
