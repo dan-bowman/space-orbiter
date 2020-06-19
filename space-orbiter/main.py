@@ -27,7 +27,7 @@ def main():
     # Initialize the actors
     # Ship initial conditions
     # Default spawn point is defined in ship class
-    ship_img_path = "ship.png"
+    ship_img_path = "assets/img/ship.png"
     ship_width = 20
     ship_height = 15
     ship = Ship(ship_img_path, ship_width, ship_height)
@@ -35,7 +35,7 @@ def main():
     # Planet initial conditions
     planet_x = 500
     planet_y = 375
-    planet_img_path = "moon1.png"
+    planet_img_path = "assets/img/moon1.png"
     planet_mass = 8e10
     planet_radius = 25
     planet_atm_height = 20
