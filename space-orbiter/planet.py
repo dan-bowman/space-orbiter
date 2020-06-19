@@ -73,5 +73,3 @@ class Planet:
         if r_vector_mag < self.inf:
             body.add_dx(accel_vector[0])
             body.add_dy(accel_vector[1])
-
-    # TODO: Implement atmospheric drag
