@@ -26,6 +26,14 @@ class Body:
     def get_center(self):
         return tuple([self.x + (self.width / 2), self.y + (self.height / 2)])
 
+    # Return a tuple that stores (width, height)
+    def get_size(self):
+        return tuple([self.width, self.height])
+
+    # Return the radius
+    def get_radius(self):
+        return self.radius
+
     # Blit sprite to screen
     def blit_sprite(self, screen):
         screen.blit(self.sprite, self.get_coords())
