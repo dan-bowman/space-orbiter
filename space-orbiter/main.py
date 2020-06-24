@@ -28,22 +28,18 @@ def main():
     # Ship initial conditions
     # Default spawn point is defined in ship class
     ship_img_path = "assets/img/ship.png"
-    ship_width = 20
-    ship_height = 15
-    ship = Ship(ship_img_path, ship_width, ship_height)
+    ship_spawn = (25, 75)
+    ship_size = (20, 15)
+    ship = Ship(ship_spawn, ship_img_path, ship_size)
 
     # Planet initial conditions
-    planet_x = 500
-    planet_y = 375
+    planet_spawn = (500, 375)
     planet_img_path = "assets/img/moon1.png"
     planet_mass = 8e10
-    planet_radius = 25
-    planet_atm_height = 20
-    planet_atm_press = 0
+    planet_size = (50, 50)
     planet_influence_height = 250
     planet_radius_offset = 1.3  # used below for fine tuning planet collision detection
-    planet = Planet(planet_x, planet_y, planet_img_path, planet_mass, planet_radius,
-                    planet_atm_height, planet_atm_press, planet_influence_height)
+    planet = Planet(planet_spawn, planet_img_path, planet_size, planet_mass, planet_influence_height)
 
     # clock = pygame.time.Clock()
 
