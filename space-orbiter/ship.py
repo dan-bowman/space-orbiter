@@ -1,8 +1,4 @@
-import pygame
-import math
-
-# Spawn location
-spawn = tuple([25, 175])
+from mobile import Mobile
 
 # Wall bounce coefficient
 bounce = -0.5
@@ -11,22 +7,17 @@ bounce = -0.5
 fuel_eff = 0.0012
 
 
-class Ship:
-    def __init__(self, img_path, width, height):
-        # Initialize position and set velocity and acceleration to zero
-        self.x = spawn[0]
-        self.y = spawn[1]
-        self.dx = 0
-        self.dy = 0
-        self.ddx = 0
-        self.ddy = 0
+class Ship(Mobile):
+    def __init__(self, spawn, img_path, size):
+        # Ship gravity interactions are negligible, initialize them to an arbitrary non-zero negligible number
+        mass = 1
+        influence_height = 1
+        # Initial velocity of ship is zero
+        vel_vector = (0.0, 0.0)
+        super().__init__(spawn, img_path, size, mass, influence_height, vel_vector)
 
-        # Load image from img_path to create sprite
-        self.sprite = pygame.image.load(img_path)
-
-        # Width and Height for collision detection
-        self.width = width
-        self.height = height
+        # Save initial spawn location for respawning
+        self.respawn_coords = spawn
 
         # Set initial fuel quantity and change in fuel (dfuel)
         self.fuel = 100.0
@@ -36,56 +27,24 @@ class Ship:
         self.thrust_x = 0.0
         self.thrust_y = 0.0
 
-    # Return a tuple with actual coordinates (top-left corner)
-    def get_coord_tuple(self):
-        return tuple([self.x, self.y])
+    # Respawn the ship to the original spawn position
+    def respawn(self):
+        self.x = self.respawn_coords[0]
+        self.y = self.respawn_coords[1]
 
-    # Return a tuple with coordinates of center
-    def get_center_tuple(self):
-        return tuple([self.x + self.width // 2, self.y + self.height // 2])
-
-    # Blit sprite to screen
-    def blit_sprite(self, screen):
-        screen.blit(self.sprite, self.get_coord_tuple())
-
-    # Add horizontal velocity
-    def add_dx(self, ddx):
-        self.dx += ddx
-
-    # Add vertical velocity
-    def add_dy(self, ddy):
-        self.dy += ddy
-
-    # Stop horizontal acceleration
-    def stop_ddx(self):
-        self.ddx = 0
-
-    # Stop vertical acceleration
-    def stop_ddy(self):
-        self.ddy = 0
-
-    # Update velocity
+    # Update velocity override to add thrust
     def update_velocity(self):
-        self.dx += self.ddx
-        self.dy += self.ddy
+        super().update_velocity()
         self.dx += self.thrust_x
         self.dy += self.thrust_y
 
-    # Update position
-    def update_position(self):
-        self.x += self.dx
-        self.y += self.dy
-
-    def get_vel_mag(self):
-        return math.sqrt(self.dx**2 + self.dy**2)
-
-    # Prograde acceleration
+    # Prograde thrust acceleration (accelerate in direction of velocity)
     def prograde(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0]
         self.thrust_y = accel_mag * vel_dir[1]
         self.use_fuel(fuel_eff)
 
-    # Retrograde acceleration
+    # Retrograde thrust acceleration (accelerate in opposite direction of velocity)
     def retrograde(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0] * -1
         self.thrust_y = accel_mag * vel_dir[1] * -1
@@ -121,14 +80,13 @@ class Ship:
             self.update_fuel()
 
     # Set collision with planet, reset ship position and velocity if collides
-    def set_planet_collision(self, planet, offset):
-        if planet.get_r_mag(self) <= offset * planet.radius:
-            self.x = spawn[0]
-            self.y = spawn[1]
-            self.dx = 0
-            self.dy = 0
-            self.ddx = 0
-            self.ddy = 0
+    def set_body_collision(self, body, offset):
+        if body.get_r_mag(self) <= offset * body.get_radius():
+            self.respawn()
+            self.stop_dx()
+            self.stop_dy()
+            self.stop_ddx()
+            self.stop_ddy()
 
     # Set bounce off screen boundaries using bounce coefficient
     def set_wall_collision(self, screen_size):
