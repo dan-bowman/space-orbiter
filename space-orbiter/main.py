@@ -16,7 +16,7 @@ def main():
 
     # Window title and icon
     pygame.display.set_caption("SPACE")
-    pygame.display.set_icon(pygame.image.load("ship.png"))
+    pygame.display.set_icon(pygame.image.load("assets/img/ship.png"))
 
     # Background color
     bg = (0, 0, 0)
@@ -62,7 +62,7 @@ def main():
         ship.set_wall_collision(screen_size)
 
         # Set collision boundaries with planet
-        ship.set_planet_collision(planet, planet_radius_offset)
+        ship.set_body_collision(planet, planet_radius_offset)
 
         # Gravitational attraction
         planet.attract_body(ship)

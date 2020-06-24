@@ -2,7 +2,7 @@ import pygame
 import math
 
 # Spawn location
-spawn = tuple([25, 175])
+spawn = tuple([25, 175])  # This can be used as a parameter
 
 # Wall bounce coefficient
 bounce = -0.5
@@ -121,8 +121,8 @@ class Ship:
             self.update_fuel()
 
     # Set collision with planet, reset ship position and velocity if collides
-    def set_planet_collision(self, planet, offset):
-        if planet.get_r_mag(self) <= offset * planet.radius:
+    def set_body_collision(self, body, offset):
+        if body.get_r_mag(self) <= offset * body.radius:
             self.x = spawn[0]
             self.y = spawn[1]
             self.dx = 0
