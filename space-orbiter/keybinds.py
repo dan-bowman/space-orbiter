@@ -32,7 +32,7 @@ def get_keystrokes(event, ship):
         # Velocity information
         vel_mag = ship.get_vel_mag()
         if vel_mag != 0.0:
-            vel_dir = tuple([ship.dx / vel_mag, ship.dy / vel_mag])
+            vel_dir = ship.get_vel_dir()
             # Prograde keybind
             if event.key == pygame.K_e and ship.fuel > 0.0:
                 ship.prograde(accel_mag, vel_dir)

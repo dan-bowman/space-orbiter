@@ -38,16 +38,24 @@ class Ship(Mobile):
         self.dx += self.thrust_x
         self.dy += self.thrust_y
 
-    # Prograde thrust acceleration (accelerate in direction of velocity)
-    def prograde(self, accel_mag, vel_dir):
+    # Add forward acceleration
+    def accel_forward(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0]
         self.thrust_y = accel_mag * vel_dir[1]
-        self.use_fuel(fuel_eff)
 
-    # Retrograde thrust acceleration (accelerate in opposite direction of velocity)
-    def retrograde(self, accel_mag, vel_dir):
+    # Add forward acceleration
+    def accel_backward(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0] * -1
         self.thrust_y = accel_mag * vel_dir[1] * -1
+
+    # Prograde thrust acceleration (accelerate in direction of velocity, using fuel)
+    def prograde(self, accel_mag, vel_dir):
+        self.accel_forward(accel_mag, vel_dir)
+        self.use_fuel(fuel_eff)
+
+    # Retrograde thrust acceleration (accelerate in opposite direction of velocity, using fuel)
+    def retrograde(self, accel_mag, vel_dir):
+        self.accel_backward(accel_mag, vel_dir)
         self.use_fuel(fuel_eff)
 
     # Add thrust to x

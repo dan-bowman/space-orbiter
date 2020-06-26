@@ -13,6 +13,22 @@ class Mobile(Gravitative):
         self.ddx = 0
         self.ddy = 0
 
+    # Return the velocity vector as a tuple
+    def get_vel_vector(self):
+        return tuple([self.dx, self.dy])
+
+    # Return the speed (velocity magnitude)
+    def get_vel_mag(self):
+        return math.sqrt(self.dx ** 2 + self.dy ** 2)
+
+    # Return the velocity direction if velocity magnitude is nonzero
+    def get_vel_dir(self):
+        vel_mag = self.get_vel_mag()
+        if vel_mag != 0.0:
+            return tuple([self.dx / vel_mag, self.dy / vel_mag])
+        else:
+            return tuple([0.0, 0.0])
+
     # Add horizontal velocity
     def add_dx(self, ddx):
         self.dx += ddx
@@ -50,7 +66,3 @@ class Mobile(Gravitative):
     def update_position(self):
         self.x += self.dx
         self.y += self.dy
-
-    # Return the speed (velocity magnitude)
-    def get_vel_mag(self):
-        return math.sqrt(self.dx ** 2 + self.dy ** 2)
