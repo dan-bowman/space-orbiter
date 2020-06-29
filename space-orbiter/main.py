@@ -3,6 +3,7 @@ import pygame
 from keybinds import get_keystrokes
 from ship import Ship
 from planet import Planet
+from atmosphere import Atmosphere
 
 
 def main():
@@ -41,6 +42,13 @@ def main():
     planet_radius_offset = 1.3  # used below for fine tuning planet collision detection
     planet = Planet(planet_spawn, planet_img_path, planet_size, planet_mass, planet_influence_height)
 
+    # Atmosphere initial conditions
+    atm_spawn = (planet_spawn[0] - planet_size[0] / 2, planet_spawn[1] - planet_size[1] / 2)
+    atm_img_path = "assets/img/atm.png"
+    atm_size = (100, 100)
+    atm_press = .002
+    atm = Atmosphere(atm_spawn, atm_img_path, atm_size, atm_press)
+
     # clock = pygame.time.Clock()
 
     while running:
@@ -63,6 +71,9 @@ def main():
         # Gravitational attraction
         planet.attract_body(ship)
 
+        # Update atmospheric drag deceleration on ship
+        atm.update_drag(ship)
+
         # Update ship velocity and position
         ship.update_velocity()
         ship.update_position()
@@ -74,10 +85,9 @@ def main():
         fuel_display_loc = (10, 10)
         fuel_display = font.render(fuel_display_string, True, (0, 255, 0))
 
-        print(ship.get_vel_mag())
-
         # Blit sprites to screen
         ship.blit_sprite(screen)
+        atm.blit_sprite(screen)
         planet.blit_sprite(screen)
 
         fuel_bar_width = 100

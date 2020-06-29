@@ -13,7 +13,7 @@ class Atmosphere(Body):
 
     def apply_drag(self, ship):
         accel_mag = self.press * self.drag
-        ship.accel_backward(accel_mag, ship.get_vel_dir())
+        ship.drag(accel_mag, ship.get_vel_dir())
 
     def update_drag(self, ship):
         distance = ship.get_r_mag(self)
@@ -25,3 +25,5 @@ class Atmosphere(Body):
             self.drag = 0.2
         else:
             self.drag = 0.3
+
+        self.apply_drag(ship)
