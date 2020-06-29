@@ -27,6 +27,10 @@ class Ship(Mobile):
         self.thrust_x = 0.0
         self.thrust_y = 0.0
 
+        # Drag vector used for atmospheric drag
+        self.drag_x = 0.0
+        self.drag_y = 0.0
+
     # Respawn the ship to the original spawn position
     def respawn(self):
         self.x = self.respawn_coords[0]
@@ -37,14 +41,20 @@ class Ship(Mobile):
         super().update_velocity()
         self.dx += self.thrust_x
         self.dy += self.thrust_y
+        self.dx += self.drag_x
+        self.dy += self.drag_y
 
-    # Prograde thrust acceleration (accelerate in direction of velocity)
+    def drag(self, accel_mag, vel_dir):
+        self.drag_x = accel_mag * vel_dir[0] * -1
+        self.drag_y = accel_mag * vel_dir[1] * -1
+
+    # Prograde thrust acceleration (accelerate in direction of velocity, using fuel)
     def prograde(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0]
         self.thrust_y = accel_mag * vel_dir[1]
         self.use_fuel(fuel_eff)
 
-    # Retrograde thrust acceleration (accelerate in opposite direction of velocity)
+    # Retrograde thrust acceleration (accelerate in opposite direction of velocity, using fuel)
     def retrograde(self, accel_mag, vel_dir):
         self.thrust_x = accel_mag * vel_dir[0] * -1
         self.thrust_y = accel_mag * vel_dir[1] * -1
