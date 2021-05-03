@@ -1,10 +1,18 @@
+import pygame
+
 from mobile import Mobile
+from keybinds import ACCEL_FINE
 
 # Wall bounce coefficient
 bounce = -0.5
 
 # Fuel efficiency (lower uses less fuel)
 fuel_eff = 0.0012
+
+# Thrust sprites
+reg_thrust_plume = pygame.image.load("assets/img/plume.png")
+hot_thrust_plume = pygame.image.load("assets/img/hot_plume.png")
+rcs_thrust_plume = pygame.image.load("assets/img/rcs.png")
 
 
 class Ship(Mobile):
@@ -31,10 +39,22 @@ class Ship(Mobile):
         self.drag_x = 0.0
         self.drag_y = 0.0
 
+        # Initialize dynamic-size list of points that draw the trailing line behind the ship
+        self.trail_points = [spawn]
+        # Ship trail resolution units (pixels)
+        self.trail_res = 15
+        # Ship trail length (number of vertices)
+        self.trail_len = 75
+
+        # Initialize ship orientation, for animation
+        self.orientation = 'right'
+
     # Respawn the ship to the original spawn position
     def respawn(self):
         self.x = self.respawn_coords[0]
         self.y = self.respawn_coords[1]
+        self.trail_points = [self.respawn_coords]
+        self.orbit_point_radii = []
 
     # Update velocity override to add thrust
     def update_velocity(self):
@@ -43,6 +63,18 @@ class Ship(Mobile):
         self.dy += self.thrust_y
         self.dx += self.drag_x
         self.dy += self.drag_y
+
+    def get_orbit_radii(self, body):
+        return [body.get_distance_from_point(point) for point in self.trail_points]
+
+    def get_periapsis(self, body):
+        return min(self.get_orbit_radii(body))
+
+    def get_apoapsis(self, body):
+        return max(self.get_orbit_radii(body))
+
+    def get_eccentricity(self, body):
+        return 1 - (2 / ((self.get_apoapsis(body) / self.get_periapsis(body)) + 1))
 
     def drag(self, accel_mag, vel_dir):
         self.drag_x = accel_mag * vel_dir[0] * -1
@@ -104,3 +136,24 @@ class Ship(Mobile):
             self.dx = self.dx * bounce
         if (self.y <= 0 and self.dy < 0) or (self.y >= (screen_size[1] - self.height) and self.dy > 0):
             self.dy = self.dy * bounce
+
+    # Override the blit_sprite function from body parent class to allow animation
+    def blit_sprite(self, screen):
+        if self.thrust_y > 0:
+            screen.blit(rcs_thrust_plume, (self.get_coords()[0] + 12, self.get_coords()[1] - 5))
+            screen.blit(rcs_thrust_plume, (self.get_coords()[0] + 3, self.get_coords()[1] - 5))
+        elif self.thrust_y < 0:
+            screen.blit(pygame.transform.flip(rcs_thrust_plume, False, True), (self.get_coords()[0] + 12, self.get_coords()[1] + 15))
+            screen.blit(pygame.transform.flip(rcs_thrust_plume, False, True), (self.get_coords()[0] + 3, self.get_coords()[1] + 15))
+        if self.orientation == 'left':
+            if 0 < abs(self.thrust_x) <= ACCEL_FINE:
+                screen.blit(pygame.transform.flip(reg_thrust_plume, True, False), (self.get_coords()[0] + 19, self.get_coords()[1] + 3))
+            elif abs(self.thrust_x) > ACCEL_FINE:
+                screen.blit(pygame.transform.flip(hot_thrust_plume, True, False), (self.get_coords()[0] + 19, self.get_coords()[1] + 3))
+            screen.blit(pygame.transform.flip(self.sprite, True, False), self.get_coords())
+        else:
+            if 0 < abs(self.thrust_x) <= ACCEL_FINE:
+                screen.blit(reg_thrust_plume, (self.get_coords()[0] - 9, self.get_coords()[1] + 3))
+            elif abs(self.thrust_x) > ACCEL_FINE:
+                screen.blit(hot_thrust_plume, (self.get_coords()[0] - 9, self.get_coords()[1] + 3))
+            screen.blit(self.sprite, self.get_coords())

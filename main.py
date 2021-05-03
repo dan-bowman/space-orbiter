@@ -12,8 +12,9 @@ def main():
     running = True
 
     # Screen size and screen object creation
-    screen_size = (1000, 750)
-    screen = pygame.display.set_mode(screen_size)
+    screen_size = (1920, 1080)
+    # screen = pygame.display.set_mode(screen_size)
+    screen = pygame.display.set_mode(screen_size, pygame.FULLSCREEN)
 
     # Window title and icon
     pygame.display.set_caption("SPACE")
@@ -49,7 +50,16 @@ def main():
     atm_press = .002
     atm = Atmosphere(atm_spawn, atm_img_path, atm_size, atm_press)
 
-    # clock = pygame.time.Clock()
+    min_orbit_radius = 180
+    min_orbit = pygame.Rect(tuple([planet.get_center()[0] - min_orbit_radius, planet.get_center()[1] - min_orbit_radius]), tuple([min_orbit_radius * 2, min_orbit_radius * 2]))
+
+    max_orbit_radius = 200
+    max_orbit = pygame.Rect(tuple([planet.get_center()[0] - max_orbit_radius, planet.get_center()[1] - max_orbit_radius]), tuple([max_orbit_radius * 2, max_orbit_radius * 2]))
+
+    success_orbit_padding = 4
+    success_orbit_radius = max_orbit_radius - (success_orbit_padding // 2)
+    success_orbit_thickness = max_orbit_radius - min_orbit_radius - success_orbit_padding
+    success_orbit = pygame.Rect(tuple([planet.get_center()[0] - success_orbit_radius, planet.get_center()[1] - success_orbit_radius]), tuple([success_orbit_radius * 2, success_orbit_radius * 2]))
 
     while running:
         # Paint screen background
@@ -85,6 +95,31 @@ def main():
         fuel_display_loc = (10, 10)
         fuel_display = font.render(fuel_display_string, True, (0, 255, 0))
 
+        score = 0
+        if min_orbit_radius <= ship.get_apoapsis(planet) <= max_orbit_radius:
+            score = int(50 / ship.get_eccentricity(planet))
+            if min_orbit_radius <= ship.get_periapsis(planet) <= max_orbit_radius:
+                pygame.draw.ellipse(screen, (0, 63, 0), success_orbit, success_orbit_thickness)
+
+        # Debug Text
+        debug_display_string = "Score: " + str(score) + " xAccel: " + str(ship.thrust_x) + " yAccel: " + str(ship.thrust_y)
+        debug_display_loc = (10, 120)
+        debug_display = font.render(debug_display_string, True, (0, 255, 0))
+
+        # Update ship trail points
+        if ship.get_distance_from_point(ship.trail_points[-1]) >= ship.trail_res:
+            ship.trail_points.append(ship.get_center())
+        # Trim the ship trail length if it gets too long
+        if len(ship.trail_points) > ship.trail_len:
+            ship.trail_points.pop(0)
+
+        # Draw a trailing line from the ship
+        if len(ship.trail_points) > 1 and ship.get_apoapsis(planet) <= planet_influence_height:
+            pygame.draw.lines(screen, (0, 127, 0), False, ship.trail_points)
+
+        pygame.draw.ellipse(screen, (127, 127, 0), min_orbit, width = 1)
+        pygame.draw.ellipse(screen, (127, 127, 0), max_orbit, width = 1)
+
         # Blit sprites to screen
         ship.blit_sprite(screen)
         atm.blit_sprite(screen)
@@ -101,6 +136,7 @@ def main():
 
         # Blit text
         screen.blit(fuel_display, fuel_display_loc)
+        screen.blit(debug_display, debug_display_loc)
 
         # Dynamic fuel bar color (Default: Green; Half-fuel: Yellow; Low-Fuel: Red)
         fuel_bar_color = (0, 255, 0)
@@ -115,7 +151,6 @@ def main():
         if ship.fuel != 0.0:
             pygame.draw.rect(screen, fuel_bar_color, fuel_bar)
 
-        # clock.tick(500)
         # Update screen at end of loop
         pygame.display.update()
 

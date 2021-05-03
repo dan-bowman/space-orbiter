@@ -35,6 +35,11 @@ class Gravitative(Body):
         return tuple([r_vector_dir[0] * gravitation / self.get_r_mag(body) ** 2,
                       r_vector_dir[1] * gravitation / self.get_r_mag(body) ** 2])
 
+    # Find the distance of self from a point in space
+    def get_distance_from_point(self, point):
+        dist_vector = tuple([self.get_center()[0] - point[0], self.get_center()[1] - point[1]])
+        return math.sqrt(dist_vector[0] ** 2 + dist_vector[1] ** 2)
+
     # Apply gravitational acceleration to body
     def attract_body(self, body):
         r_vector_mag = self.get_r_mag(body)
