@@ -1,10 +1,13 @@
 import pygame
+import sys
 
-ACCEL = 0.00017
-ACCEL_FINE = 0.00005
+ACCEL = 0.017
+ACCEL_FINE = 0.005
 
 # Hardcoded keystroke event handlers for moving the ship
 def get_keystrokes(event, ship):
+    tick_time = 30
+
     # Magnitude of acceleration applied from keystrokes
     accel_mag = ACCEL
 
@@ -64,6 +67,24 @@ def get_keystrokes(event, ship):
                 ship.dy = 0.0
                 ship.ddx = 0.0
                 ship.ddy = 0.0
+    
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_q:
+            pygame.display.quit()
+            pygame.quit()
+            sys.exit()
+
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_MINUS:
+            tick_time -= 10
+            if tick_time <= 10:
+                tick_time = 10
+    
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_EQUALS:
+            tick_time += 10
+            if tick_time >= 500:
+                tick_time = 500
 
     # KEYUP events
     if event.type == pygame.KEYUP:
@@ -72,3 +93,5 @@ def get_keystrokes(event, ship):
             ship.add_thrust_x(0.0)
         if event.key in (pygame.K_w, pygame.K_s, pygame.K_r, pygame.K_e, pygame.K_t):
             ship.add_thrust_y(0.0)
+
+    return tick_time

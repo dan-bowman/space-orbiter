@@ -10,6 +10,8 @@ def main():
     # Initial setup
     pygame.init()
     running = True
+    clock = pygame.time.Clock()
+    tick_time = 30
 
     # Screen size and screen object creation
     screen_size = (1920, 1080)
@@ -70,7 +72,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-            get_keystrokes(event, ship)
+            tick_time = get_keystrokes(event, ship)
 
         # Set collision boundaries with walls
         ship.set_wall_collision(screen_size)
@@ -150,6 +152,8 @@ def main():
         # Fuel bar disappears if fuel is depleted
         if ship.fuel != 0.0:
             pygame.draw.rect(screen, fuel_bar_color, fuel_bar)
+
+        clock.tick(tick_time)
 
         # Update screen at end of loop
         pygame.display.update()
