@@ -55,4 +55,4 @@ Body
 
 ## Status
 
-Active side project. Currently a single-system sandbox. This codebase may be ported or reimplemented in Godot/GDScript as development toward a fuller game continues — working title *Apsis Arcade*.
+Active side project. Currently a single-system sandbox. This codebase may be ported or reimplemented in Godot/GDScript as development toward a fuller game continues.
